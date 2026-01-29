@@ -19,7 +19,7 @@ This project explores two aspects of HR analytics: employee performance predicti
 
 ## How to Run
 1. Place both Excel files in the `data/` folder.  
-2. Open `notebooks/Project4_Section2.Rmd` in RStudio.  
+2. Open `notebooks/Project4.Rmd` in RStudio.  
 3. Knit the R Markdown file to HTML to view results and visualizations.  
 
 ## Key Insights

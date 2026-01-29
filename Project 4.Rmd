@@ -1,0 +1,105 @@
+---
+title: "Project 4 - Section 2"
+author: "Sophia Amsden"
+date: "2025-04-08"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tree)
+library(readxl)
+library(knitr)
+```
+
+## Section 2
+
+Load in the data set.
+```{r}
+library(tree)
+EmployeePerformance <- read_excel("C:/Users/Lenovo/Downloads/EmployeePerformance.xlsx")
+kable(head(EmployeePerformance), caption = "Sample of EmployeePerformance dataset")
+```
+
+### Data Preprocessing
+```{r}
+EmployeePerf2<-na.omit(EmployeePerformance)
+```
+
+### Model Building
+Split the data into test-train (50-50)
+```{r}
+set.seed(42)
+train <- sample(1:nrow(EmployeePerf2), nrow(EmployeePerf2)/2)
+```
+
+Build the regression tree using the package
+```{r}
+tree.EmployeePerformance <- tree(PerformanceScore ~ YearsofExperience + AverageMonthlyWorkHours + TrainingHours + CommunicationSkills, data = EmployeePerf2, subset = train)
+summary(tree.EmployeePerformance)
+```
+Plot the tree and check for the number of terminal nodes
+```{r}
+plot(tree.EmployeePerformance)
+text(tree.EmployeePerformance, pretty = 0)
+```
+
+### Prediction
+```{r}
+yhat <- predict(tree.EmployeePerformance, newdata = EmployeePerf2[-train,c("YearsofExperience", "AverageMonthlyWorkHours", "TrainingHours", "CommunicationSkills")])
+```
+
+Prediction for a new employee:
+```{r}
+new_employee <- data.frame(YearsofExperience = 5, AverageMonthlyWorkHours = 160, TrainingHours = 20, CommunicationSkills = 8)
+predicted_performance <- predict(tree.EmployeePerformance, new_employee)
+cat("Predicted Performance Score for the new employee is:")
+  round(predicted_performance, 4)
+```
+
+## Section 3
+Load in the data set.
+```{r}
+library(readxl)
+EmployeeAttrition <- read_excel("C:/Users/Lenovo/Downloads/EmployeeAttrition.xlsx")
+# Convert Attrition to a factor
+EmployeeAttrition$Attrition <- as.factor(EmployeeAttrition$Attrition)
+
+# Confirm levels
+levels(EmployeeAttrition$Attrition)
+# Output: "No" "Yes"
+
+```
+
+### Build a Logistic Function
+Start by splitting the data into 70% training and 30% testing.
+```{r}
+library(caret)
+set.seed(123)
+trainIndex <- createDataPartition(EmployeeAttrition$Attrition, p = 0.7, list = FALSE, times = 1)
+data_train <- EmployeeAttrition[trainIndex, ]
+data_test <- EmployeeAttrition[-trainIndex, ]
+```
+
+### Build a logistic regression 
+```{r}
+library(gmodels)
+logistic_model<-glm(Attrition ~ Age + Gender + EducationField + JobSatisfaction + YearsAtCompany, data = data_train, family = binomial)
+
+summary(logistic_model)
+```
+
+### Prediction
+```{r}
+new_employee <- data.frame(
+  Age = 30,
+  Gender = "Female",
+  EducationField = "Marketing",
+  JobSatisfaction = 4,
+  YearsAtCompany = 1
+)
+
+predicted_prob <- predict(logistic_model, new_employee, type = "response")
+predicted_prob
+```
+
